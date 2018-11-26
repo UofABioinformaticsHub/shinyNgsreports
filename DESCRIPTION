@@ -1,0 +1,19 @@
+Package: FastqcShiny
+Type: Package
+Title: ngsReports shinyApp 
+Version: 0.99.0
+Author: Christopher M. Ward, Hien To, Stephen M. Pedersen 
+Maintainer: Christopher Ward <christopher.ward@adelaide.edu.au>
+Description: The shinyApp for the R package ngsReports. Visualize many FastQc reports at once in interactive plots.
+License: LGPL (>= 2)
+Encoding: UTF-8
+Depends:
+	ngsReports,
+        shiny,
+        shinydashboard
+Imports:
+        magrittr,
+        plotly,
+        shinyFiles
+LazyData: true
+RoxygenNote: 6.1.0
