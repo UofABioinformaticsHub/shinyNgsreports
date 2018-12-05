@@ -1,6 +1,6 @@
-Package: FastqcShiny
+Package: ngsReportsShinyApp
 Type: Package
-Title: ngsReports shinyApp 
+Title: ngsReports-shinyApp 
 Version: 0.99.0
 Author: Christopher M. Ward, Hien To, Stephen M. Pedersen 
 Maintainer: Christopher Ward <christopher.ward@adelaide.edu.au>
@@ -17,3 +17,4 @@ Imports:
         shinyFiles
 LazyData: true
 RoxygenNote: 6.1.0
+biocViews: QualityControl, ReportWriting
