@@ -4,10 +4,9 @@ Graphical User Interface for inspecting FastQC reports using the [ngsReports](ht
 
 ## Installation
 To install required packages and the ngsReports base package follow the instructions below.
-Currently you need to install the fastqcTheoreticalGC package separately.
 
 ```
-source("https://bioconductor.org/biocLite.R")
+install.packages("BiocManager")
 pkgs <- c("BiocGenerics", "BiocStyle", "BSgenome", "checkmate", "devtools", "ggdendro",  "plotly",
 "reshape2", "Rsamtools", "scales", "ShortRead", "tidyverse",  "viridis", "viridisLite", "zoo", 
 "mikelove/fastqcTheoreticalGC", "UofABioinformaticsHub/ngsReports")
