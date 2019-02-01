@@ -1,6 +1,6 @@
-# ngsReports-shinyApp
+# fastqcRShiny
 
-Graphical User Interface for the [ngsReports](https://github.com/UofABioinformaticsHub/ngsReports) R package. 
+Graphical User Interface for inspecting FastQC reports using the [ngsReports](https://github.com/UofABioinformaticsHub/ngsReports) R package. 
 
 ## Installation
 To install required packages and the ngsReports base package follow the instructions below.
@@ -8,13 +8,12 @@ Currently you need to install the fastqcTheoreticalGC package separately.
 
 ```
 source("https://bioconductor.org/biocLite.R")
-biocLite(c("BiocGenerics", "BiocStyle", "BSgenome", "checkmate", "devtools", "ggdendro",  "plotly", "reshape2", "Rsamtools", "scales", "ShortRead", "tidyverse",  "viridis", "viridisLite", "zoo"))
-devtools::install_github('mikelove/fastqcTheoreticalGC')
-devtools::install_github('UofABioinformaticsHub/ngsReports', build_vignettes = FALSE)
-devtools::install_github('UofABioinformaticsHub/ngsReports-shinyApp')
+pkgs <- c("BiocGenerics", "BiocStyle", "BSgenome", "checkmate", "devtools", "ggdendro",  "plotly", "reshape2", "Rsamtools", "scales", "ShortRead", "tidyverse",  "viridis", "viridisLite", "zoo", "mikelove/fastqcTheoreticalGC", "UofABioinformaticsHub/ngsReports")
+BiocManager::install(pkgs)
+BiocManager::install('UofABioinformaticsHub/fastqcRShiny')
 
 library(ngsReports)
-library(ngsReportsShinyApp)
+library(fastqcRShiny)
 ```
 
 # Citation 
