@@ -54,35 +54,33 @@
 #' @importFrom shinyFiles getVolumes
 #'
 #' @examples
-#' # Get the files included with the package
-#' barcodes <- c("ATTG", "CCGC",
-#'  "CCGT", "GACC", "TTAT", "TTGG")
-#' suffix <- c("R1_fastqc.zip",
-#'  "R2_fastqc.zip")
-#' fileList <- paste(rep(barcodes,
-#'  each = 2), rep(suffix, times = 5), sep = "_")
-#' fileList <- system.file("extdata",
-#'  fileList, package = "ngsReports")
-#'
-#' # Load the FASTQC data as a FastqcDataList
+#' \dontrun{
+#' Get the files included with the package ngsReports
+#' packageDir <- system.file("extdata", package = "ngsReports")
+#' fileList <- list.files(packageDir, pattern = "fastqc.zip", full.names = TRUE)
+#' 
+#' # Load the FASTQC data as a FastqcDataList object
 #' fdl <- getFastqcData(fileList)
 #'
 #' # Run the Shiny app
 #' fastqcShiny(fdl)
+#' }
 #'
 #' @export
 #' @rdname fastqcShiny
 #'
 
 fastqcShiny <- function(fastqcInput = NULL) {
-  # check if the initial value of fastqcInput is null and check class of object passed along with length
+  ## check if the initial value of fastqcInput is null and check class of
+  ## object passed along with length
   if (!is.null(fastqcInput)) {
     stopifnot(length(fastqcInput) > 1)
-    stopifnot(class(fastqcInput) == "character" |
-                class(fastqcInput)[1] == "FastqcDataList")
+    stopifnot(
+        any(is(fastqcInput, "character"), is(fastqcInput, "FastqcDataList"))
+    )
   }
 
-  # set out menu logic for downstream
+  ## set out menu logic for downstream
   menuItemLogic <- function(flags) {
     ## initiate the menue logic for PASS, WARN, FAIL flags
     ## menuLogic will be a list of length 5 containing information on flags
@@ -606,7 +604,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
   )
 
   ui <- dashboardPage(
-    dashboardHeader(title = "ngsR::FASTQC"),
+    dashboardHeader(title = "fastqcRShiny"),
     dashboardSidebar(
       sidebarMenu(
         menuItem(text = "Summary", tabName = "BS"),
@@ -678,14 +676,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
         selectInput(
           "omicSpecies",
           "Select species",
-          choices = genomes(gcTheoretical)$Name,
+          choices = genomes(ngsReports::gcTheoretical)$Name,
           selected = "Hsapiens"
         )
       } else{
         selectInput(
           "omicSpecies",
           "Select species",
-          choices = transcriptomes(gcTheoretical)$Name,
+          choices = transcriptomes(ngsReports::gcTheoretical)$Name,
           selected = "Hsapiens"
         )
       }
@@ -1447,14 +1445,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
             selectInput(
               "GCspecies",
               "Select species",
-              choices = genomes(gcTheoretical)$Name,
+              choices = genomes(ngsReports::gcTheoretical)$Name,
               selected = "Hsapiens"
             )
           } else{
             selectInput(
               "GCspecies",
               "Select species",
-              choices = transcriptomes(gcTheoretical)$Name,
+              choices = transcriptomes(ngsReports::gcTheoretical)$Name,
               selected = "Hsapiens"
             )
           }

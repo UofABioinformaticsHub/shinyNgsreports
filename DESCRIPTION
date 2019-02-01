@@ -1,20 +1,23 @@
-Package: ngsReportsShinyApp
+Package: fastqcRShiny
 Type: Package
-Title: ngsReports-shinyApp 
+Title: Shiny App for loading multiple FastQC reports 
 Version: 0.99.0
-Author: Christopher M. Ward, Hien To, Stephen M. Pedersen 
+Authors@R: c(
+    person("Steve", "Pederson", , "stephen.pederson@adelaide.edu.au", c("aut")),
+    person("Christopher", "Ward", , "christopher.ward@adelaide.edu.au", c("aut", "cre"))
+    )
 Maintainer: Christopher Ward <christopher.ward@adelaide.edu.au>
-Description: The shinyApp for the R package ngsReports. Visualize many FastQc reports at once in interactive plots.
+Description: The shinyApp for the R package ngsReports. Visualize many FastQC reports at once in interactive plots.
 License: LGPL (>= 2)
 Encoding: UTF-8
 Depends:
 	ngsReports,
-        shiny,
-        shinydashboard
+    shiny,
+    shinydashboard
 Imports:
-        magrittr,
-        plotly,
-        shinyFiles
+    magrittr,
+    plotly,
+    shinyFiles
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 biocViews: QualityControl, ReportWriting

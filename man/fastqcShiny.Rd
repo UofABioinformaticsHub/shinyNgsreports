@@ -27,20 +27,16 @@ take a while to render if the
 \code{fastqcInput} has many elements
 }
 \examples{
-# Get the files included with the package
-barcodes <- c("ATTG", "CCGC",
- "CCGT", "GACC", "TTAT", "TTGG")
-suffix <- c("R1_fastqc.zip",
- "R2_fastqc.zip")
-fileList <- paste(rep(barcodes,
- each = 2), rep(suffix, times = 5), sep = "_")
-fileList <- system.file("extdata",
- fileList, package = "ngsReports")
+\dontrun{
+Get the files included with the package ngsReports
+packageDir <- system.file("extdata", package = "ngsReports")
+fileList <- list.files(packageDir, pattern = "fastqc.zip", full.names = TRUE)
 
-# Load the FASTQC data as a FastqcDataList
+# Load the FASTQC data as a FastqcDataList object
 fdl <- getFastqcData(fileList)
 
 # Run the Shiny app
 fastqcShiny(fdl)
+}
 
 }
