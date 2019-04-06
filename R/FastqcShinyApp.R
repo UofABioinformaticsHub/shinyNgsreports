@@ -58,7 +58,7 @@
 #' Get the files included with the package ngsReports
 #' packageDir <- system.file("extdata", package = "ngsReports")
 #' fileList <- list.files(packageDir, pattern = "fastqc.zip", full.names = TRUE)
-#' 
+#'
 #' # Load the FASTQC data as a FastqcDataList object
 #' fdl <- getFastqcData(fileList)
 #'
@@ -116,6 +116,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
   }
 
 
+
+  ###### renders the box for presence or access of an icon
   renderValBox <- function(count, status, ic, c) {
     renderValueBox({
       valueBox(
@@ -130,6 +132,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
 
 
 
+
+  ## start rendering the dashboard gui
   body <- dashboardBody(
     tabItems(
       tabItem(
@@ -603,9 +607,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
 
   )
 
+
+  ### ui page
   ui <- dashboardPage(
     dashboardHeader(title = "fastqcRShiny"),
     dashboardSidebar(
+        #### gender the menu items
       sidebarMenu(
         menuItem(text = "Summary", tabName = "BS"),
         menuItem(text = "Total Sequences", tabName = "TS"),
@@ -620,73 +627,64 @@ fastqcShiny <- function(fastqcInput = NULL) {
         menuItemOutput("ACflag"),
         menuItemOutput("KCflag"),
         menuItem(text = "Output HTML Report", tabName = "HTML")
-
-
+        
+        
       ),
       width = 250
     ),
     body
   )
-
-
+  
+  
+  
+  ### backend
   server <- function(input,
                      output,
                      session) {
-    # set up reactives
-    values <- reactiveValues()
-
-    #rective function repsonsible for loading in the selected files or just using the fdl supplied
-    data <- reactive({
-      # get the volumes when the shiny button is clicked
-      volumes <- getVolumes()
-      #choose the files from the root directory of the current volume and show only show zip files in the loadout
-      shinyFileChoose(
-        input,
-        "files",
-        roots = volumes,
-        session = session,
-        filetypes = "zip"
-      )
-      #get the metadata for the file that is selected, files is the element bade in the body script
-      fileSelected <- parseFilePaths(volumes,
-                                     input$files)
-      # make the selected file a character vector
-      fileSelected <- as.character(fileSelected$datapath)
-      # import the selected file(s)
-      selectedData <- getFastqcData(fileSelected)
-      #check that input$files is empty (ie no files are selected)
-      if (!length(input$files) > 1) {
-        #if a character string is provided, it will import the data for you
-        if (class(fastqcInput) == "character")
-          selectedData <-
-            getFastqcData(fastqcInput)
-        # otherwise just use the FastQCData provided
-        else
-          selectedData <-
-            fastqcInput
-      }
-      # return the data
-      selectedData
-    })
-
+      # set up reactives
+      values <- reactiveValues()
+      
+      #rective function repsonsible for loading in the selected files or just using the fdl supplied
+      data <- reactive({
+          #check that input$files is empty (ie no files are selected)
+          if(!length(fastqcInput)){
+              # get the volumes when the shiny button is clicked
+              volumes <- getVolumes()
+              #choose the files from the root directory of the current volume and show only show zip files in the loadout
+              shinyFileChoose(
+                  input,
+                  "files",
+                  roots = volumes,
+                  session = session,
+                  filetypes = "zip"
+              )
+              #get the metadata for the file that is selected, files is the element bade in the body script
+              fileSelected <- parseFilePaths(volumes,
+                                             input$files)
+              # make the selected file a character vector
+              fastqcInput <- as.character(fileSelected$datapath)
+              # import the selected file(s)
+              #selectedData <- FastqcDataList(fileSelected)
+              }
+          else{
+              #if a character string is provided, it will import the data for you
+              if (class(fastqcInput) == "character"){
+                  FastqcDataList(fastqcInput)} else fastqcInput
+          }
+          
+      })
+      
+      
 
     #render the UI for gcTheoretical
     output$sequencedSpecies <- renderUI({
-      if (input$omicsType == "Genome") {
         selectInput(
           "omicSpecies",
           "Select species",
-          choices = genomes(ngsReports::gcTheoretical)$Name,
+          choices = gcAvail(ngsReports::gcTheoretical, type = input$omicsType)$Name,
           selected = "Hsapiens"
         )
-      } else{
-        selectInput(
-          "omicSpecies",
-          "Select species",
-          choices = transcriptomes(ngsReports::gcTheoretical)$Name,
-          selected = "Hsapiens"
-        )
-      }
+
     })
 
 
@@ -736,7 +734,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           {
             writeHtmlReport(dir(),
                             species = values$omicSpecies,
-                            dataType = input$omicsType)
+                            gcType = input$omicsType)
           }
         )
         output$report2 <- renderText("Done!")
@@ -1287,7 +1285,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           data(),
           usePlotly = TRUE,
           cluster = input$Sumcluster,
-          dendrogram = TRUE
+          dendrogram = input$Sumcluster
         ) %>%
           layout(margin = list(r = 200))
       }
@@ -1318,13 +1316,13 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
-        plotBaseQualities(
+        plotBaseQuals(
           data(),
           usePlotly = TRUE,
           plotType = "heatmap",
           plotValue = input$BQplotValue,
           cluster = input$BQcluster,
-          dendrogram = TRUE
+          dendrogram = input$BQcluster
         ) %>%
           layout(margin = list(r = 200))
       }
@@ -1342,7 +1340,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- which(fileName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
-        plotBaseQualities(sub_fdl, usePlotly = TRUE) %>%
+        plotBaseQuals(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200, b = 50))
       }
     })
@@ -1356,11 +1354,11 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
-        plotSequenceQualities(
+        plotSeqQuals(
           data(),
           cluster = input$SQcluster,
-          counts = FALSE,
-          dendrogram = TRUE,
+          counts = input$SQType == "Counts",
+          dendrogram = input$SQcluster,
           usePlotly = TRUE
         ) %>% layout(margin = list(r = 200))
       }
@@ -1379,7 +1377,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         }
         sub_fdl <- data()[[num]]
         qualPlot <-
-          plotSequenceQualities(sub_fdl, usePlotly = TRUE) %>%
+          plotSeqQuals(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200),
                  legend = list(orientation = 'h', title = ""))
       }
@@ -1394,10 +1392,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
-        plotSequenceContent(
+        plotSeqContent(
           data(),
           cluster = input$SCcluster,
-          dendrogram = TRUE,
+          dendrogram = input$SCcluster,
           usePlotly = TRUE
         ) %>%
           layout(margin = list(r = 200))
@@ -1417,7 +1415,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- which(fileName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
-        plotSequenceContent(sub_fdl, usePlotly = TRUE) %>%
+        plotSeqContent(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200))
       }
     })
@@ -1441,21 +1439,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
     output$GCspecies <- renderUI({
       if (!is.null(input$theoreticalGC)) {
         if (input$theoreticalGC) {
-          if (input$theoreticalType == "Genome") {
             selectInput(
               "GCspecies",
               "Select species",
-              choices = genomes(ngsReports::gcTheoretical)$Name,
-              selected = "Hsapiens"
-            )
-          } else{
-            selectInput(
-              "GCspecies",
-              "Select species",
-              choices = transcriptomes(ngsReports::gcTheoretical)$Name,
-              selected = "Hsapiens"
-            )
-          }
+              choices = gcAvail(ngsReports::gcTheoretical, type = input$theoreticalType)$Name,
+              selected = "Hsapiens")
+
         }
       }
     })
@@ -1480,7 +1469,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
             cluster = input$GCcluster,
             plotType = "heatmap",
             theoreticalType = input$theoreticalType,
-            dendrogram = TRUE,
+            dendrogram = input$GCcluster,
             usePlotly = TRUE
           ) %>%
             layout(margin = list(r = 200))
@@ -1491,7 +1480,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
             plotType = "heatmap",
             theoreticalType = input$theoreticalType,
             theoreticalGC = input$theoreticalGC,
-            dendrogram = TRUE,
+            dendrogram = input$GCcluster,
             species = GCspecies,
             usePlotly = TRUE
           ) %>%
@@ -1550,7 +1539,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         plotNContent(
           data(),
           cluster = input$Ncluster,
-          dendrogram = TRUE,
+          dendrogram = input$Ncluster,
           usePlotly = TRUE
         )
       }
@@ -1586,10 +1575,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
-        plotSequenceLengthDistribution(
+        plotSeqLengthDistn(
           data(),
           cluster = input$SLcluster,
-          dendrogram = TRUE,
+          dendrogram = input$SLcluster,
           counts = input$SLType == "Counts",
           usePlotly = TRUE
         ) %>%
@@ -1609,7 +1598,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- which(fileName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
-        plotSequenceLengthDistribution(sub_fdl,
+        plotSeqLengthDistn(sub_fdl,
                                        usePlotly = TRUE,
                                        plotType = "line") %>%
           layout(margin = list(r = 200))
@@ -1625,10 +1614,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
-        plotDuplicationLevels(
+        plotDupLevels(
           data(),
           cluster = input$Dupcluster,
-          dendrogram = TRUE,
+          dendrogram = input$Dupcluster,
           usePlotly = TRUE
         ) %>%
           layout(margin = list(r = 200))
@@ -1647,7 +1636,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- which(fileName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
-        plotDuplicationLevels(sub_fdl, usePlotly = TRUE) %>%
+        plotDupLevels(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200))
       }
     })
@@ -1661,11 +1650,11 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
-        plotOverrepresentedSummary(
+        plotOverrep(
           data(),
           usePlotly = TRUE,
           cluster = input$OScluster,
-          dendrogram = TRUE
+          dendrogram = input$OScluster
         ) %>%
           layout(margin = list(r = 200))
       }
@@ -1685,7 +1674,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- which(fileName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
-        plotOverrepresentedSummary(sub_fdl, usePlotly = TRUE) %>%
+        plotOverrep(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200))
       }
     })
@@ -1703,7 +1692,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           data(),
           adapterType = input$ACtype,
           usePlotly = TRUE,
-          dendrogram = TRUE,
+          dendrogram = input$ACcluster,
           cluster = input$ACcluster
         )
         if (!is.null(ACplot))
@@ -1762,7 +1751,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           data(),
           usePlotly = TRUE,
           cluster = input$KMcluster,
-          dendrogram = TRUE
+          dendrogram = input$KMcluster
         )
         if (!is.null(Kplot))
           Kplot %>% layout(margin = list(r = 200))
