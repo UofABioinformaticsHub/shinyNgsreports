@@ -487,15 +487,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
         column(
           width = 2,
           box(
-            selectInput(
+            textInput(
               "ACtype",
-              "Choose Adapter Type",
-              choices = c(
-                "Total",
-                "Illumina Universal",
-                "Illumina Small RNA",
-                "Nextera Transposase"
-              )
+              "Regular expression matching the adapter(s) to be plotted",
+              value = "Total"
             ),
             checkboxInput("ACcluster",
                           "Cluster",
@@ -643,6 +638,9 @@ fastqcShiny <- function(fastqcInput = NULL) {
                      session) {
       # set up reactives
       values <- reactiveValues()
+      
+      ## wait timer
+      autoInvalidate <- reactiveTimer(2000)
       
       #rective function repsonsible for loading in the selected files or just using the fdl supplied
       data <- reactive({
@@ -924,7 +922,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         values$SDLcountP <- items[[5]]
 
         menuItem(
-          text = "Sequence Duplicaiton Levels",
+          text = "Sequence Duplication Levels",
           tabName = "SDL",
           badgeLabel = values$SDLflag,
           badgeColor = values$SDLcolour
@@ -990,7 +988,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
       }
     })
 
-    output$ACflag <- renderMenu({
+    output$KCflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Kmer Content")
@@ -1683,6 +1681,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
     # Adapter Content
     ####################
 
+   
     output$ACheatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
