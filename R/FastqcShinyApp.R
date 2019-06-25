@@ -154,9 +154,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         box(
           h1("Summary of fastQC Flags"),
           h5(
-            "Heatmap of fastQC flags
-            (pass, warning or fail) for
-            each fastQC report"
+            "Heatmap of fastQC flags (PASS/WARN/FAIL) for each fastQC report"
           ),
           plotlyOutput("SummaryFlags"),
           width = 10
@@ -172,8 +170,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         ),
         box(
           h1("Total Sequences"),
-          h5("Total number of unique and
-             duplicated reads in each sample"),
+          h5("Total number of unique and duplicated reads in each sample"),
           plotlyOutput("ReadTotals"),
           width = 10
         )
@@ -201,12 +198,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
         box(
           h1("Per Base Sequence Quality"),
           h5(
-            "Per base sequence quality in
-            each sample, can either view mean or
-            median for each cycle"
+            paste(
+              "Per base sequence quality in each sample can either view",  
+              "mean or median for each cycle"
+            )
           ),
-          h5("Click sidebar on heatmap to change
-             line plots"),
+          h5("Click sidebar on heatmap to change line plots"),
           plotlyOutput("baseQualHeatmap"),
           br(),
           plotlyOutput("BaseQualitiesSingle"),
@@ -234,16 +231,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
           valueBoxOutput("SQboxF", width = NULL)
         ),
         box(
-          h1("Per Sequence
-             Quality Scores"),
+          h1("Per Sequence Quality Scores"),
           h5(
-            "Per base sequence quality
-            in each sample, can either
-            view mean or median for each
-            cycle"
+            paste(
+              "Per base sequence quality in each sample, can either",
+              "view mean or median for each cycle"
+            )
           ),
-          h5("Click sidebar on heatmap to
-             change line plots"),
+          h5("Click sidebar on heatmap to change line plots"),
           plotlyOutput("seqQualHeatmap"),
           br(),
           plotlyOutput("SeqQualitiesSingle"),
@@ -267,12 +262,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
         box(
           h1("Per Base Sequence Content"),
           h5(
-            "Per base sequence content in
-            each sample, colours at each
-            base indicate sequence bias"
+            paste(
+              "Per base sequence content in each sample.", 
+              "Colours at each base indicate sequence bias"
+            )
           ),
-          h5("G = Black, A = Green,
-             T = Red, C = Blue"),
+          h5("G = Black, A = Green, T = Red, C = Blue"),
           plotlyOutput("SCHeatmap"),
           br(),
           plotlyOutput("SCsingle"),
@@ -301,12 +296,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
         box(
           h1("Per Sequence GC Content"),
           h5(
-            "GC content (%) in sample,
-            can either view total count
-            or frequency"
+            paste(
+              "GC content (%) in sample can either view total count", 
+              "or frequency"
+            )
           ),
-          h5("Click sidebar on heatmap
-             to change line plots"),
+          h5("Click sidebar on heatmap to change line plots"),
           plotlyOutput("GCheatmap"),
           br(),
           plotlyOutput("GCSingle"),
@@ -330,9 +325,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         box(
           h1("Per base N content"),
           h5("N content (%) in sample"),
-          h5("If dendrogram is truncated
-             double click on dendrogram to
-             resize"),
+          h5("If dendrogram is truncated double click on dendrogram to resize"),
           plotlyOutput("NCheatmap"),
           br(),
           plotlyOutput("NCsingle"),
@@ -362,12 +355,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
         box(
           h1("Sequence Length Distribution"),
           h5(
-            "Sequence length distribution
-            in each sample, can either
-            view total count or frequency"
+            paste(
+            "Sequence length distribution in each sample, can either view", 
+            "total count or frequency"
+            )
           ),
-          h5("Click sidebar on heatmap to
-             change line plots"),
+          h5("Click sidebar on heatmap to change line plots"),
           plotlyOutput("SLHeatmap"),
           br(),
           plotlyOutput("SLSingle"),
@@ -390,10 +383,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
         ),
         box(
           h1("Sequence Duplication Levels"),
-          h5("Sequence duplication in
-             each sample"),
-          h5("Click sidebar on heatmap
-             to change line plots"),
+          h5("Sequence duplication in each sample"),
+          h5("Click sidebar on heatmap to change line plots"),
           plotlyOutput("DupHeatmap"),
           br(),
           plotlyOutput("DupSingle"),
@@ -406,8 +397,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           width = 2,
           box(
             checkboxInput("OScluster", "Cluster", value = TRUE),
-            h5("Export Overrepresented
-               Sequences"),
+            h5("Export Overrepresented Sequences"),
             shinyDirButton(
               id = "dirOS",
               label = "Choose directory",
@@ -423,8 +413,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         ),
         box(
           h1("Overrepresented Sequences"),
-          h5("Origin of Overrepresented
-           sequences within each sample"),
+          h5("Origin of Overrepresented sequences within each sample"),
           plotlyOutput("OSummary"),
           br(),
           plotlyOutput("OSsingle"),
@@ -452,8 +441,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         ),
         box(
           h1("Adapter content"),
-          h5("Adapter content
-             (%) across all reads"),
+          h5("Adapter content (%) across all reads"),
           plotlyOutput("ACheatmap"),
           br(),
           plotlyOutput("ACsingle"),
@@ -477,9 +465,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
         box(
           h1("Kmer Content"),
           h5(
-            "Total Identified Kmer
-            Count by Position.
-            \nPlease load a file to see the top 6 Kmers."
+            paste(
+              "Total Identified Kmer Count by Position."
+              "\nPlease load a file to see the top 6 Kmers."
+            )
           ),
           plotlyOutput("Kheatmap"),
           br(),
@@ -511,12 +500,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
           )
         ),
         box(
-          h1("Output HTML Report
-             Using the Default Template "),
+          h1("Output HTML Report Using the Default Template "),
           h5(
-            "Select the type of data
-            used in your study (-omic)
-            and a closely related organism"
+            paste(
+            "Select the type of omic data used in your study",
+            "and the most suitable organism"
+            )
           ),
           h5(
             "from the dropdown list. Upon
