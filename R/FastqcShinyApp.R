@@ -76,10 +76,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
   if (!is.null(fastqcInput)) {
     stopifnot(length(fastqcInput) > 1)
     stopifnot(
-        any(is(fastqcInput, "character"), is(fastqcInput, "FastqcDataList"))
+      any(is(fastqcInput, "character"), is(fastqcInput, "FastqcDataList"))
     )
   }
-
+  
   ## set out menu logic for downstream
   menuItemLogic <- function(flags) {
     ## initiate the menue logic for PASS, WARN, FAIL flags
@@ -93,46 +93,40 @@ fastqcShiny <- function(fastqcInput = NULL) {
       menuLogic[[1]] <- "WARN"
       menuLogic[[2]] <- "yellow"
     }
-
+    
     if (all(flags$Status == "FAIL")) {
       menuLogic[[1]] <- "FAIL"
       menuLogic[[2]] <- "red"
     }
-
+    
     # Fail values
-    menuLogic[[3]] <-
-      c(sum(flags$Status == "FAIL"), length(flags$Status))
-
-    menuLogic[[4]] <-
-      c(sum(flags$Status == "WARN"), length(flags$Status))
-
+    menuLogic[[3]] <- c(sum(flags$Status == "FAIL"), length(flags$Status))
+    
+    menuLogic[[4]] <- c(sum(flags$Status == "WARN"), length(flags$Status))
+    
     # Pass values
-    menuLogic[[5]] <-
-      c(sum(flags$Status == "PASS"), length(flags$Status))
-
-
-
+    menuLogic[[5]] <-c(sum(flags$Status == "PASS"), length(flags$Status))
+    
     menuLogic
   }
-
-
-
+  
+  
+  
   ###### renders the box for presence or access of an icon
   renderValBox <- function(count, status, ic, c) {
     renderValueBox({
       valueBox(
         value = paste(count[1], count[2], sep = "/"),
         subtitle = status,
-        icon = icon(ic,
-                    class = "fa-lg"),
+        icon = icon(ic, class = "fa-lg"),
         color = c
       )
     })
   }
-
-
-
-
+  
+  
+  
+  
   ## start rendering the dashboard gui
   body <- dashboardBody(
     tabItems(
@@ -151,9 +145,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
             br(),
             textOutput("report"),
             br(),
-            checkboxInput("Sumcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("Sumcluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
@@ -173,9 +165,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
       tabItem(
         tabName = "TS",
         box(
-          checkboxInput("showDup",
-                        "Show Duplicated?",
-                        value = FALSE),
+          checkboxInput("showDup", "Show Duplicated?", value = FALSE),
           collapsible = TRUE,
           width = 2,
           title = "Options"
@@ -199,19 +189,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
               choices = c("Mean", "Median"),
               selected = "Mean"
             ),
-            checkboxInput("BQcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("BQcluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("BQboxP",
-                         width = NULL),
-          valueBoxOutput("BQboxW",
-                         width = NULL),
-          valueBoxOutput("BQboxF",
-                         width = NULL)
+          valueBoxOutput("BQboxP", width = NULL),
+          valueBoxOutput("BQboxW", width = NULL),
+          valueBoxOutput("BQboxF", width = NULL)
         ),
         box(
           h1("Per Base Sequence Quality"),
@@ -239,19 +224,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
               choices = c("Frequency", "Counts"),
               selected = "Frequency"
             ),
-            checkboxInput("SQcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("SQcluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("SQboxP",
-                         width = NULL),
-          valueBoxOutput("SQboxW",
-                         width = NULL),
-          valueBoxOutput("SQboxF",
-                         width = NULL)
+          valueBoxOutput("SQboxP", width = NULL),
+          valueBoxOutput("SQboxW", width = NULL),
+          valueBoxOutput("SQboxF", width = NULL)
         ),
         box(
           h1("Per Sequence
@@ -275,19 +255,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
         column(
           width = 2,
           box(
-            checkboxInput("SCcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("SCcluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("SCboxP",
-                         width = NULL),
-          valueBoxOutput("SCboxW",
-                         width = NULL),
-          valueBoxOutput("SCboxF",
-                         width = NULL)
+          valueBoxOutput("SCboxP", width = NULL),
+          valueBoxOutput("SCboxW", width = NULL),
+          valueBoxOutput("SCboxF", width = NULL)
         ),
         box(
           h1("Per Base Sequence Content"),
@@ -309,9 +284,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         column(
           width = 2,
           box(
-            checkboxInput("GCcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("GCcluster", "Cluster", value = TRUE),
             checkboxInput("theoreticalGC",
                           "Normalize To Theoretical GC",
                           value = FALSE),
@@ -321,12 +294,9 @@ fastqcShiny <- function(fastqcInput = NULL) {
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("GCboxP",
-                         width = NULL),
-          valueBoxOutput("GCboxW",
-                         width = NULL),
-          valueBoxOutput("GCboxF",
-                         width = NULL)
+          valueBoxOutput("GCboxP", width = NULL),
+          valueBoxOutput("GCboxW", width = NULL),
+          valueBoxOutput("GCboxF", width = NULL)
         ),
         box(
           h1("Per Sequence GC Content"),
@@ -348,19 +318,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
         column(
           width = 2,
           box(
-            checkboxInput("Ncluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("Ncluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("NCboxP",
-                         width = NULL),
-          valueBoxOutput("NCboxW",
-                         width = NULL),
-          valueBoxOutput("NCboxF",
-                         width = NULL)
+          valueBoxOutput("NCboxP", width = NULL),
+          valueBoxOutput("NCboxW", width = NULL),
+          valueBoxOutput("NCboxF", width = NULL)
         ),
         box(
           h1("Per base N content"),
@@ -382,23 +347,17 @@ fastqcShiny <- function(fastqcInput = NULL) {
             radioButtons(
               inputId = "SLType",
               label = "Value to plot",
-              choices = c("Frequency",
-                          "Counts"),
+              choices = c("Frequency", "Counts"),
               selected = "Frequency"
             ),
-            checkboxInput("SLcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("SLcluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("SLDboxP",
-                         width = NULL),
-          valueBoxOutput("SLDboxW",
-                         width = NULL),
-          valueBoxOutput("SLDboxF",
-                         width = NULL)
+          valueBoxOutput("SLDboxP", width = NULL),
+          valueBoxOutput("SLDboxW", width = NULL),
+          valueBoxOutput("SLDboxF", width = NULL)
         ),
         box(
           h1("Sequence Length Distribution"),
@@ -420,19 +379,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
         column(
           width = 2,
           box(
-            checkboxInput("Dupcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("Dupcluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("SDLboxP",
-                         width = NULL),
-          valueBoxOutput("SDLboxW",
-                         width = NULL),
-          valueBoxOutput("SDLboxF",
-                         width = NULL)
+          valueBoxOutput("SDLboxP", width = NULL),
+          valueBoxOutput("SDLboxW", width = NULL),
+          valueBoxOutput("SDLboxF", width = NULL)
         ),
         box(
           h1("Sequence Duplication Levels"),
@@ -451,9 +405,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         column(
           width = 2,
           box(
-            checkboxInput("OScluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("OScluster", "Cluster", value = TRUE),
             h5("Export Overrepresented
                Sequences"),
             shinyDirButton(
@@ -465,12 +417,9 @@ fastqcShiny <- function(fastqcInput = NULL) {
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("OSboxP",
-                         width = NULL),
-          valueBoxOutput("OSboxW",
-                         width = NULL),
-          valueBoxOutput("OSboxF",
-                         width = NULL)
+          valueBoxOutput("OSboxP", width = NULL),
+          valueBoxOutput("OSboxW", width = NULL),
+          valueBoxOutput("OSboxF", width = NULL)
         ),
         box(
           h1("Overrepresented Sequences"),
@@ -492,19 +441,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
               "Regular expression matching the adapter(s) to be plotted",
               value = "Total"
             ),
-            checkboxInput("ACcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("ACcluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("ACboxP",
-                         width = NULL),
-          valueBoxOutput("ACboxW",
-                         width = NULL),
-          valueBoxOutput("ACboxF",
-                         width = NULL)
+          valueBoxOutput("ACboxP", width = NULL),
+          valueBoxOutput("ACboxW", width = NULL),
+          valueBoxOutput("ACboxF", width = NULL)
         ),
         box(
           h1("Adapter content"),
@@ -521,19 +465,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
         column(
           width = 2,
           box(
-            checkboxInput("KMcluster",
-                          "Cluster",
-                          value = TRUE),
+            checkboxInput("KMcluster", "Cluster", value = TRUE),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
           ),
-          valueBoxOutput("KCboxP",
-                         width = NULL),
-          valueBoxOutput("KCboxW",
-                         width = NULL),
-          valueBoxOutput("KCboxF",
-                         width = NULL)
+          valueBoxOutput("KCboxP", width = NULL),
+          valueBoxOutput("KCboxW", width = NULL),
+          valueBoxOutput("KCboxF", width = NULL)
         ),
         box(
           h1("Kmer Content"),
@@ -599,15 +538,15 @@ fastqcShiny <- function(fastqcInput = NULL) {
         )
       )
     )
-
+    
   )
-
-
+  
+  
   ### ui page
   ui <- dashboardPage(
     dashboardHeader(title = "fastqcRShiny"),
     dashboardSidebar(
-        #### gender the menu items
+      #### gender the menu items
       sidebarMenu(
         menuItem(text = "Summary", tabName = "BS"),
         menuItem(text = "Total Sequences", tabName = "TS"),
@@ -633,67 +572,65 @@ fastqcShiny <- function(fastqcInput = NULL) {
   
   
   ### backend
-  server <- function(input,
-                     output,
-                     session) {
-      # set up reactives
-      values <- reactiveValues()
+  server <- function(input, output, session) {
+    # set up reactives
+    values <- reactiveValues()
+    
+    ## wait timer
+    autoInvalidate <- reactiveTimer(2000)
+    
+    #rective function repsonsible for loading in the selected files or just using the fdl supplied
+    data <- reactive({
       
-      ## wait timer
-      autoInvalidate <- reactiveTimer(2000)
+      data <- fastqcInput
+      #check that input$files is empty (ie no files are selected)
+      if(!length(fastqcInput)){
+        # get the volumes when the shiny button is clicked
+        volumes <- getVolumes()
+        #choose the files from the root directory of the current volume and show only show zip files in the loadout
+        shinyFileChoose(
+          input,
+          "files",
+          roots = volumes,
+          session = session,
+          filetypes = "zip"
+        )
+        #get the metadata for the file that is selected, files is the element bade in the body script
+        fileSelected <- parseFilePaths(volumes, input$files)
+        # make the selected file a character vector
+        data <- as.character(fileSelected$datapath)
+        # import the selected file(s)
+        #selectedData <- FastqcDataList(fileSelected)
+      }
+      else{
+        #if a character string is provided, it will import the data for you
+        if (class(fastqcInput) == "character") {
+          FastqcDataList(data)
+        } else data
+      }
       
-      #rective function repsonsible for loading in the selected files or just using the fdl supplied
-      data <- reactive({
-          
-          data <- fastqcInput
-          #check that input$files is empty (ie no files are selected)
-          if(!length(fastqcInput)){
-              # get the volumes when the shiny button is clicked
-              volumes <- getVolumes()
-              #choose the files from the root directory of the current volume and show only show zip files in the loadout
-              shinyFileChoose(
-                  input,
-                  "files",
-                  roots = volumes,
-                  session = session,
-                  filetypes = "zip"
-              )
-              #get the metadata for the file that is selected, files is the element bade in the body script
-              fileSelected <- parseFilePaths(volumes,
-                                             input$files)
-              # make the selected file a character vector
-              data <- as.character(fileSelected$datapath)
-              # import the selected file(s)
-              #selectedData <- FastqcDataList(fileSelected)
-              }
-          else{
-              #if a character string is provided, it will import the data for you
-              if (class(fastqcInput) == "character"){
-                  FastqcDataList(data)} else data
-          }
-          
-      })
-      
-      
-
+    })
+    
+    
+    
     #render the UI for gcTheoretical
     output$sequencedSpecies <- renderUI({
-        selectInput(
-          "omicSpecies",
-          "Select species",
-          choices = gcAvail(ngsReports::gcTheoretical, type = input$omicsType)$Name,
-          selected = "Hsapiens"
-        )
-
+      selectInput(
+        "omicSpecies",
+        "Select species",
+        choices = gcAvail(ngsReports::gcTheoretical, type = input$omicsType)$Name,
+        selected = "Hsapiens"
+      )
+      
     })
-
-
+    
+    
     species <- observeEvent(input$omicSpecies, {
       values$omicSpecies <- input$omicSpecies
     })
-
+    
     #export overrepresented
-
+    
     expOS <- reactive({
       volumes <- shinyFiles::getVolumes()
       shinyFiles::shinyDirChoose(input, "dirOS",
@@ -701,7 +638,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
       dirSelected <- shinyFiles::parseDirPath(volumes, input$dirOS)
       as.character(dirSelected)
     })
-
+    
     observe({
       if (length(expOS())) {
         exportOverrepresented(
@@ -712,17 +649,18 @@ fastqcShiny <- function(fastqcInput = NULL) {
         )
       }
     })
-
+    
     # export HTML
     dir <- reactive({
       input$dirs
       volumes <- getVolumes()
-      shinyFiles::shinyDirChoose(input, "dirs",
-                                 roots = volumes, session = session)
+      shinyFiles::shinyDirChoose(
+        input = input, id = "dirs", roots = volumes, session = session
+      )
       dirSelected <- shinyFiles::parseDirPath(volumes, input$dirs)
       as.character(dirSelected)
     })
-
+    
     observe({
       dir()
       if (length(dir())) {
@@ -740,542 +678,505 @@ fastqcShiny <- function(fastqcInput = NULL) {
         output$report2 <- renderText("Done!")
       }
     })
-
-
+    
+    
     #### dynamic tabs to show pass warn Fail ########
-
+    
     # render the menu item for the Summary tab
-
+    
     output$BQflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
         Category <- c()
-        flags <-
-          subset(flags, Category == "Per base sequence quality")
-
+        flags <- subset(flags, Category == "Per base sequence quality")
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$BQflag <- items[[1]]
         values$BQcolour <- items[[2]]
         values$BQcountF <- items[[3]]
         values$BQcountW <- items[[4]]
         values$BQcountP <- items[[5]]
-
+        
         menuItem(
           text = "Base Quality",
           tabName = "BQ",
           badgeLabel = values$BQflag,
           badgeColor = values$BQcolour
         )
-
+        
       }
       else{
         menuItem(text = "Base Quality", tabName = "BQ")
       }
     })
-
-
+    
+    
     output$SQflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
-        flags <-
-          subset(flags, Category == "Per sequence quality scores")
-
+        flags <- subset(flags, Category == "Per sequence quality scores")
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$SQflag <- items[[1]]
         values$SQcolour <- items[[2]]
         values$SQcountF <- items[[3]]
         values$SQcountW <- items[[4]]
         values$SQcountP <- items[[5]]
-
+        
         menuItem(
           text = "Sequence Quality",
           tabName = "SQ",
           badgeLabel = values$SQflag,
           badgeColor = values$SQcolour
         )
-
+        
       }
       else{
         menuItem(text = "Sequence Quality", tabName = "SQ")
       }
     })
-
+    
     output$SCflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
-        flags <-
-          subset(flags, Category == "Per base sequence content")
-
+        flags <- subset(flags, Category == "Per base sequence content")
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$SCflag <- items[[1]]
         values$SCcolour <- items[[2]]
         values$SCcountF <- items[[3]]
         values$SCcountW <- items[[4]]
         values$SCcountP <- items[[5]]
-
+        
         menuItem(
           text = "Sequence Content",
           tabName = "SC",
           badgeLabel = values$SCflag,
           badgeColor = values$SCcolour
         )
-
+        
       }
       else{
         menuItem(text = "Sequence Content", tabName = "SC")
       }
     })
-
+    
     output$GCflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
-        flags <-
-          subset(flags, Category == "Per sequence GC content")
-
+        flags <- subset(flags, Category == "Per sequence GC content")
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$GCflag <- items[[1]]
         values$GCcolour <- items[[2]]
         values$GCcountF <- items[[3]]
         values$GCcountW <- items[[4]]
         values$GCcountP <- items[[5]]
-
+        
         menuItem(
           text = "GC Content",
           tabName = "GC",
           badgeLabel = values$GCflag,
           badgeColor = values$GCcolour
         )
-
+        
       }
       else{
         menuItem(text = "GC Content", tabName = "GC")
       }
     })
-
+    
     output$NCflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Per base N content")
-
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$NCflag <- items[[1]]
         values$NCcolour <- items[[2]]
         values$NCcountF <- items[[3]]
         values$NCcountW <- items[[4]]
         values$NCcountP <- items[[5]]
-
+        
         menuItem(
           text = "N Content",
           tabName = "NC",
           badgeLabel = values$NCflag,
           badgeColor = values$NCcolour
         )
-
+        
       }
       else{
         menuItem(text = "N Content", tabName = "NC")
       }
     })
-
+    
     output$SLDflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
-        flags <-
-          subset(flags, Category == "Sequence Length Distribution")
-
+        flags <- subset(flags, Category == "Sequence Length Distribution")
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$SLDflag <- items[[1]]
         values$SLDcolour <- items[[2]]
         values$SLDcountF <- items[[3]]
         values$SLDcountW <- items[[4]]
         values$SLDcountP <- items[[5]]
-
+        
         menuItem(
           text = "Sequence Length Distribution",
           tabName = "SLD",
           badgeLabel = values$SLDflag,
           badgeColor = values$SLDcolour
         )
-
+        
       }
       else{
         menuItem(text = "Sequence Length Distribution", tabName = "SLD")
       }
     })
-
+    
     output$SDLflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
-        flags <-
-          subset(flags, Category == "Sequence Duplication Levels")
-
+        flags <- subset(flags, Category == "Sequence Duplication Levels")
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$SDLflag <- items[[1]]
         values$SDLcolour <- items[[2]]
         values$SDLcountF <- items[[3]]
         values$SDLcountW <- items[[4]]
         values$SDLcountP <- items[[5]]
-
+        
         menuItem(
           text = "Sequence Duplication Levels",
           tabName = "SDL",
           badgeLabel = values$SDLflag,
           badgeColor = values$SDLcolour
         )
-
+        
       }
       else{
         menuItem(text = "Sequence Duplicaiton Levels", tabName = "SDL")
       }
     })
-
+    
     output$OSflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
-        flags <-
-          subset(flags, Category == "Overrepresented sequences")
-
+        flags <- subset(flags, Category == "Overrepresented sequences")
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$OSflag <- items[[1]]
         values$OScolour <- items[[2]]
         values$OScountF <- items[[3]]
         values$OScountW <- items[[4]]
         values$OScountP <- items[[5]]
-
+        
         menuItem(
           text = "Overrepresented Sequences",
           tabName = "OS",
           badgeLabel = values$OSflag,
           badgeColor = values$OScolour
         )
-
+        
       }
       else{
         menuItem(text = "Overrepresented Sequences", tabName = "OS")
       }
     })
-
-
+    
+    
     output$ACflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Adapter Content")
-
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$ACflag <- items[[1]]
         values$ACcolour <- items[[2]]
         values$ACcountF <- items[[3]]
         values$ACcountW <- items[[4]]
         values$ACcountP <- items[[5]]
-
+        
         menuItem(
           text = "Adapter Content",
           tabName = "AC",
           badgeLabel = values$ACflag,
           badgeColor = values$ACcolour
         )
-
+        
       }
       else{
         menuItem(text = "Adapter Content", tabName = "AC")
       }
     })
-
+    
     output$KCflag <- renderMenu({
       if (!is.null(fastqcInput) | length(input$files) > 1) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Kmer Content")
-
+        
         items <- menuItemLogic(flags = flags)
-
+        
         values$KCflag <- items[[1]]
         values$KCcolour <- items[[2]]
         values$KCcountF <- items[[3]]
         values$KCcountW <- items[[4]]
         values$KCcountP <- items[[5]]
-
+        
         menuItem(
           text = "K-mer Content",
           tabName = "KC",
           badgeLabel = values$KCflag,
           badgeColor = values$KCcolour
         )
-
+        
       }
       else{
         menuItem(text = "K-mer Content", tabName = "KC")
       }
     })
-
+    
     observe({
       input$files
-
-      output$BQboxF <-
-        renderValBox(
-          count = values$BQcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$SQboxF <-
-        renderValBox(
-          count = values$SQcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$SCboxF <-
-        renderValBox(
-          count = values$SCcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$GCboxF <-
-        renderValBox(
-          count = values$GCcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$NCboxF <-
-        renderValBox(
-          count = values$NCcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$SLDboxF <-
-        renderValBox(
-          count = values$SLDcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$SDLboxF <-
-        renderValBox(
-          count = values$SDLcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$OSboxF <-
-        renderValBox(
-          count = values$OScountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$ACboxF <-
-        renderValBox(
-          count = values$ACcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
-      output$KCboxF <-
-        renderValBox(
-          count = values$KCcountF,
-          status = "FAIL",
-          ic = "times",
-          c = "red"
-        )
-
+      
+      output$BQboxF <- renderValBox(
+        count = values$BQcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$SQboxF <- renderValBox(
+        count = values$SQcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$SCboxF <- renderValBox(
+        count = values$SCcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$GCboxF <- renderValBox(
+        count = values$GCcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$NCboxF <- renderValBox(
+        count = values$NCcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$SLDboxF <- renderValBox(
+        count = values$SLDcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$SDLboxF <- renderValBox(
+        count = values$SDLcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$OSboxF <- renderValBox(
+        count = values$OScountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$ACboxF <- renderValBox(
+        count = values$ACcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
+      output$KCboxF <- renderValBox(
+        count = values$KCcountF,
+        status = "FAIL",
+        ic = "times",
+        c = "red"
+      )
+      
       #render warn value boxes
-
-      output$BQboxW <-
-        renderValBox(
-          count = values$BQcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$SQboxW <-
-        renderValBox(
-          count = values$SQcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$SCboxW <-
-        renderValBox(
-          count = values$SCcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$GCboxW <-
-        renderValBox(
-          count = values$GCcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$NCboxW <-
-        renderValBox(
-          count = values$NCcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$SLDboxW <-
-        renderValBox(
-          count = values$SLDcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$SDLboxW <-
-        renderValBox(
-          count = values$SDLcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$OSboxW <-
-        renderValBox(
-          count = values$OScountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$ACboxW <-
-        renderValBox(
-          count = values$ACcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
-      output$KCboxW <-
-        renderValBox(
-          count = values$KCcountW,
-          status = "WARN",
-          ic = "exclamation",
-          c = "yellow"
-        )
-
+      
+      output$BQboxW <- renderValBox(
+        count = values$BQcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$SQboxW <- renderValBox(
+        count = values$SQcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$SCboxW <- renderValBox(
+        count = values$SCcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$GCboxW <- renderValBox(
+        count = values$GCcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$NCboxW <- renderValBox(
+        count = values$NCcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$SLDboxW <- renderValBox(
+        count = values$SLDcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$SDLboxW <- renderValBox(
+        count = values$SDLcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$OSboxW <- renderValBox(
+        count = values$OScountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$ACboxW <- renderValBox(
+        count = values$ACcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
+      output$KCboxW <- renderValBox(
+        count = values$KCcountW,
+        status = "WARN",
+        ic = "exclamation",
+        c = "yellow"
+      )
+      
       #render Pass value boxes
-
-      output$BQboxP <-
-        renderValBox(
-          count = values$BQcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$SQboxP <-
-        renderValBox(
-          count = values$SQcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$SCboxP <-
-        renderValBox(
-          count = values$SCcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$GCboxP <-
-        renderValBox(
-          count = values$GCcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$NCboxP <-
-        renderValBox(
-          count = values$NCcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$SLDboxP <-
-        renderValBox(
-          count = values$SLDcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$SDLboxP <-
-        renderValBox(
-          count = values$SDLcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$OSboxP <-
-        renderValBox(
-          count = values$OScountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$ACboxP <-
-        renderValBox(
-          count = values$ACcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
-
-      output$KCboxP <-
-        renderValBox(
-          count = values$KCcountP,
-          status = "PASS",
-          ic = "check",
-          c = "green"
-        )
+      
+      output$BQboxP <- renderValBox(
+        count = values$BQcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$SQboxP <- renderValBox(
+        count = values$SQcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$SCboxP <- renderValBox(
+        count = values$SCcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$GCboxP <- renderValBox(
+        count = values$GCcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$NCboxP <- renderValBox(
+        count = values$NCcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$SLDboxP <- renderValBox(
+        count = values$SLDcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$SDLboxP <- renderValBox(
+        count = values$SDLcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$OSboxP <- renderValBox(
+        count = values$OScountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$ACboxP <- renderValBox(
+        count = values$ACcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
+      
+      output$KCboxP <- renderValBox(
+        count = values$KCcountP,
+        status = "PASS",
+        ic = "check",
+        c = "green"
+      )
     })
     #render fail value boxes
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     # render plots
-
+    
     ####################
     # Summary
     ####################
-
+    
     output$SummaryFlags <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1290,11 +1191,11 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200))
       }
     })
-
+    
     ####################
     # Read Totals
     ####################
-
+    
     output$ReadTotals <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1306,11 +1207,11 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(l = 100, r = 200))
       }
     })
-
+    
     ####################
     # Base Quality
     ####################
-
+    
     output$baseQualHeatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1327,7 +1228,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200))
       }
     })
-
+    
     output$BaseQualitiesSingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1344,11 +1245,11 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200, b = 50))
       }
     })
-
+    
     ####################
     # Sequence Quality
     ####################
-
+    
     output$seqQualHeatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1363,7 +1264,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         ) %>% layout(margin = list(r = 200))
       }
     })
-
+    
     output$SeqQualitiesSingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1382,11 +1283,11 @@ fastqcShiny <- function(fastqcInput = NULL) {
                  legend = list(orientation = 'h', title = ""))
       }
     })
-
+    
     ####################
     # Sequence Content
     ####################
-
+    
     output$SCHeatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1401,8 +1302,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200))
       }
     })
-
-
+    
+    
     output$SCsingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1419,12 +1320,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200))
       }
     })
-
-
+    
+    
     ####################
     # GC Content
     ####################
-
+    
     output$theoreticalGC <- renderUI({
       if (input$theoreticalGC) {
         radioButtons(
@@ -1435,22 +1336,22 @@ fastqcShiny <- function(fastqcInput = NULL) {
         )
       }
     })
-
+    
     output$GCspecies <- renderUI({
       if (!is.null(input$theoreticalGC)) {
         if (input$theoreticalGC) {
-            selectInput(
-              "GCspecies",
-              "Select species",
-              choices = gcAvail(ngsReports::gcTheoretical, type = input$theoreticalType)$Name,
-              selected = "Hsapiens")
-
+          selectInput(
+            "GCspecies",
+            "Select species",
+            choices = gcAvail(ngsReports::gcTheoretical, type = input$theoreticalType)$Name,
+            selected = "Hsapiens")
+          
         }
       }
     })
-
-
-
+    
+    
+    
     output$GCheatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1460,9 +1361,9 @@ fastqcShiny <- function(fastqcInput = NULL) {
           GCspecies <- FALSE
         } else
           GCspecies <- input$GCspecies
-
+        
         GCtype <- input$GCheatType == "Count"
-
+        
         if (is.null(input$theoreticalGC)) {
           plotGcContent(
             data(),
@@ -1486,10 +1387,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
           ) %>%
             layout(margin = list(r = 200))
         }
-
+        
       }
     })
-
+    
     output$GCSingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1499,7 +1400,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           GCspecies <- FALSE
         } else
           GCspecies <- input$GCspecies
-
+        
         if (is.null(event_data("plotly_click")$key[[1]])) {
           num <- 1
         } else {
@@ -1525,12 +1426,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
                  legend = list(orientation = 'h', title = ""))
       }
     })
-
-
+    
+    
     ####################
     # N Content
     ####################
-
+    
     output$NCheatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1544,10 +1445,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
         )
       }
     })
-
-
+    
+    
     # N Content single plot
-
+    
     output$NCsingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1564,12 +1465,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200, b = 50))
       }
     })
-
-
+    
+    
     ####################
     # Sequence Length Distribution
     ####################
-
+    
     output$SLHeatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1585,8 +1486,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200))
       }
     })
-
-
+    
+    
     output$SLSingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1600,16 +1501,16 @@ fastqcShiny <- function(fastqcInput = NULL) {
         }
         sub_fdl <- data()[[num]]
         plotSeqLengthDistn(sub_fdl,
-                                       usePlotly = TRUE,
-                                       plotType = "line") %>%
+                           usePlotly = TRUE,
+                           plotType = "line") %>%
           layout(margin = list(r = 200))
       }
     })
-
+    
     ####################
     # Sequence Duplicaiton Levels
     ####################
-
+    
     output$DupHeatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1624,7 +1525,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200))
       }
     })
-
+    
     output$DupSingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1641,11 +1542,11 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200))
       }
     })
-
+    
     ####################
     # Overrepresented sequences
     ####################
-
+    
     output$OSummary <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1659,10 +1560,10 @@ fastqcShiny <- function(fastqcInput = NULL) {
         ) %>%
           layout(margin = list(r = 200))
       }
-
+      
     })
-
-
+    
+    
     output$OSsingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1679,12 +1580,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
           layout(margin = list(r = 200))
       }
     })
-
+    
     ####################
     # Adapter Content
     ####################
-
-   
+    
+    
     output$ACheatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1709,7 +1610,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           )
       }
     })
-
+    
     output$ACsingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1723,7 +1624,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         }
         sub_fdl <- data()[[num]]
         ACsing <- plotAdapterContent(sub_fdl, usePlotly = TRUE)
-
+        
         if (!is.null(ACsing))
           ACsing %>%
           layout(margin = list(r = 200),
@@ -1738,12 +1639,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
           )
       }
     })
-
-
+    
+    
     ####################
     # k-mer Content
     ####################
-
+    
     output$Kheatmap <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1761,7 +1662,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           stop(paste("Samples have no Kmer content"))
       }
     })
-
+    
     output$Ksingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1776,7 +1677,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         }
         sub_fdl <- data()[[num]]
         Ksing <- plotKmers(sub_fdl, usePlotly = TRUE)
-
+        
         if (!is.null(Ksing))
           Ksing %>%
           layout(margin = list(r = 200, b = 50))
@@ -1788,8 +1689,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
       }
     })
   }
-
+  
   runApp(list(ui = ui, server = server), launch.browser = TRUE)
-
+  
 }
 
