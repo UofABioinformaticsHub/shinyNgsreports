@@ -1232,7 +1232,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         plotBaseQuals(sub_fdl, usePlotly = TRUE) %>%
@@ -1268,7 +1269,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         qualPlot <-
@@ -1307,7 +1309,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         plotSeqContent(sub_fdl, usePlotly = TRUE) %>%
@@ -1399,7 +1402,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         if (is.null(input$theoreticalGC)) {
@@ -1452,7 +1456,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         plotNContent(sub_fdl, usePlotly = TRUE) %>%
@@ -1491,7 +1496,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         plotSeqLengthDistn(sub_fdl,
@@ -1529,7 +1535,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         plotDupLevels(sub_fdl, usePlotly = TRUE) %>%
@@ -1567,7 +1574,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         plotOverrep(sub_fdl, usePlotly = TRUE) %>%
@@ -1614,7 +1622,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(fqName(data()) == click$key[[1]])
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         ACsing <- plotAdapterContent(sub_fdl, usePlotly = TRUE)
@@ -1666,8 +1675,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           num <- 1
         } else {
           click <- event_data("plotly_click")
-          num <- which(grepl(click$key[[1]],
-                             fqName(data())))
+          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
+          else num <- which(fqName(data()) == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         Ksing <- plotKmers(sub_fdl, usePlotly = TRUE)
