@@ -156,7 +156,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           h5(
             "Heatmap of fastQC flags (PASS/WARN/FAIL) for each fastQC report"
           ),
-          plotlyOutput("SummaryFlags"),
+          plotlyOutput("SummaryFlags", height = 700),
           width = 10
         )
       ),
@@ -398,11 +398,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
           box(
             checkboxInput("OScluster", "Cluster", value = TRUE),
             h5("Export Overrepresented Sequences"),
-            shinyDirButton(
-              id = "dirOS",
-              label = "Choose directory",
-              title = ""
-            ),
+            directoryInput('ORdirs', label = 'Select a directory', value = '~'),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
@@ -483,17 +479,13 @@ fastqcShiny <- function(fastqcInput = NULL) {
           box(
             radioButtons(
               inputId = "omicsType",
-              label = "What type of -omic?",
+              label = "-omic Type",
               choices = c("Genome", "Transcriptome"),
               selected = "Genome"
             ),
             htmlOutput("sequencedSpecies"),
             h5("Output report for files"),
-            shinyDirButton(
-              id = "dirs",
-              label = "Choose directory",
-              title = ""
-            ),
+            directoryInput('dirs', label = 'Select a directory', value = '~'),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
@@ -527,7 +519,6 @@ fastqcShiny <- function(fastqcInput = NULL) {
         )
       )
     )
-    
   )
   
   
@@ -572,9 +563,19 @@ fastqcShiny <- function(fastqcInput = NULL) {
     ## wait timer
     #rective function repsonsible for loading in the selected files or just using the fdl supplied
     data <- reactive({
+        
+        
       input$files
+        
       data <- fastqcInput
       #check that input$files is empty (ie no files are selected)
+      
+      withProgress(
+          min = 0,
+          max = 1,
+          value = 0.8,
+          message = "Reading in files.",
+          {
       if(!length(fastqcInput)){
         # get the volumes when the shiny button is clicked
          
@@ -585,7 +586,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
           "files",
           roots = volumes,
           session = session,
-          filetypes = "zip"
+          filetypes = "zip",
+          defaultPath = getwd()
         )
         #get the metadata for the file that is selected, files is the element bade in the body script
         fileSelected <- parseFilePaths(volumes, input$files)
@@ -602,7 +604,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
             FastqcDataList(data)
         } else data
       }
-      
+          }
+      )
     })
     
     
@@ -625,53 +628,114 @@ fastqcShiny <- function(fastqcInput = NULL) {
     
     #export overrepresented
     
-    expOS <- reactive({
-      volumes <- shinyFiles::getVolumes()
-      shinyFiles::shinyDirChoose(input, "dirOS",
-                                 roots = volumes, session = session)
-      dirSelected <- shinyFiles::parseDirPath(volumes, input$dirOS)
-      as.character(dirSelected)
-    })
+    observeEvent(
+        ignoreNULL = TRUE,
+        eventExpr = {
+            input$ORdirs
+        },
+        handlerExpr = {
+            if (input$ORdirs > 0) {
+                
+                path <- choose.dir(default = readDirectoryInput(session, "ORdirs"))
+                withProgress(
+                    min = 0,
+                    max = 1,
+                    value = 0.8,
+                    message = "Exporting Overrepresented Sequences",
+                    {
+                        exportOverrepresented(
+                            data(),
+                            path = paste0(path, "/OverrepSequences", "-", Sys.Date()),
+                            n = 10,
+                            noAdapters = TRUE
+                        )
+                    }
+                )
+                
+                # update the widget value
+                updateDirectoryInput(session, "ORdirs", value = path)
+            }
+        }
+    )
     
-    observe({
-      if (length(expOS())) {
-        exportOverrepresented(
-          data(),
-          path = paste0(expOS(), "/OverrepSequences", "-", Sys.Date()),
-          n = 10,
-          noAdapters = TRUE
-        )
-      }
-    })
+    # expOS <- reactive({
+    #   volumes <- shinyFiles::getVolumes()
+    #   shinyFiles::shinyDirChoose(input, "dirOS",
+    #                              roots = volumes, session = session)
+    #   dirSelected <- shinyFiles::parseDirPath(volumes, input$dirOS)
+    #   as.character(dirSelected)
+    # })
+    # 
+    # observe({
+    #   if (length(expOS())) {
+    #     exportOverrepresented(
+    #       data(),
+    #       path = paste0(expOS(), "/OverrepSequences", "-", Sys.Date()),
+    #       n = 10,
+    #       noAdapters = TRUE
+    #     )
+    #   }
+    # })
     
-    # export HTML
-    dir <- reactive({
-      input$dirs
-      volumes <- getVolumes()
-      shinyFiles::shinyDirChoose(
-        input = input, id = "dirs", roots = volumes, session = session
-      )
-      dirSelected <- shinyFiles::parseDirPath(volumes, input$dirs)
-      as.character(dirSelected)
-    })
+    # # export HTML
+    # dir <- reactive({
+    #   input$dirs
+    #   volumes <- getVolumes()
+    #   shinyFiles::shinyDirChoose(
+    #     input = input, id = "dirs", roots = volumes, session = session, defaultPath = "~/"
+    #   )
+    #   dirSelected <- shinyFiles::parseDirPath(volumes, input$dirs)
+    #   as.character(dirSelected)
+    # })
+    # 
+    # observe({
+    #   dir()
+    #   if (length(dir())) {
+    #     withProgress(
+    #       min = 0,
+    #       max = 1,
+    #       value = 0.8,
+    #       message = "Writing report",
+    #       {
+    #         writeHtmlReport(dir(),
+    #                         species = values$omicSpecies,
+    #                         gcType = input$omicsType, overwrite = TRUE)
+    #       }
+    #     )
+    #     output$report2 <- renderText("Done!")
+    #   }
+    # })
+    # 
     
-    observe({
-      dir()
-      if (length(dir())) {
-        withProgress(
-          min = 0,
-          max = 1,
-          value = 0.8,
-          message = "Writing report",
-          {
-            writeHtmlReport(dir(),
-                            species = values$omicSpecies,
-                            gcType = input$omicsType)
-          }
-        )
-        output$report2 <- renderText("Done!")
-      }
-    })
+    #### new export html
+    observeEvent(
+        ignoreNULL = TRUE,
+        eventExpr = {
+            input$dirs
+        },
+        handlerExpr = {
+            if (input$dirs > 0) {
+                
+                path <- choose.dir(default = readDirectoryInput(session, "dirs"))
+                withProgress(
+                    min = 0,
+                    max = 1,
+                    value = 0.8,
+                    message = "Writing report",
+                    {
+                        writeHtmlReport(path,
+                                        species = values$omicSpecies,
+                                        gcType = input$omicsType, overwrite = TRUE)
+                    }
+                )
+                output$report2 <- renderText("Done!")
+                
+                
+                # update the widget value
+                updateDirectoryInput(session, "dirs", value = path)
+            }
+        }
+    )
     
     
     #### dynamic tabs to show pass warn Fail ########
@@ -1161,9 +1225,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
     #render fail value boxes
     
     
-    
-    
-    
+   
     
     # render plots
     
@@ -1176,13 +1238,20 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
+          withProgress(
+              min = 0,
+              max = 1,
+              value = 0.8,
+              message = "Rendering plot.",
+              {
         plotSummary(
           data(),
           usePlotly = TRUE,
           cluster = input$Sumcluster,
           dendrogram = input$Sumcluster
         ) %>%
-          layout(margin = list(r = 200))
+          layout(margin = list(r = 200))}
+          )
       }
     })
     
@@ -1195,10 +1264,17 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
+          withProgress(
+              min = 0,
+              max = 1,
+              value = 0.8,
+              message = "Rendering plot.",
+              {
         plotReadTotals(data(),
                        usePlotly = TRUE,
                        duplicated = input$showDup) %>%
-          layout(margin = list(l = 100, r = 200))
+          layout(margin = list(l = 100, r = 200))}
+          )
       }
     })
     
@@ -1211,6 +1287,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
+          withProgress(
+              min = 0,
+              max = 1,
+              value = 0.8,
+              message = "Rendering plot.",
+              {
         plotBaseQuals(
           data(),
           usePlotly = TRUE,
@@ -1219,26 +1301,32 @@ fastqcShiny <- function(fastqcInput = NULL) {
           cluster = input$BQcluster,
           dendrogram = input$BQcluster
         ) %>%
-          layout(margin = list(r = 200))
+          layout(margin = list(r = 200))   
+              }
+          )
       }
     })
     
+    
     output$BaseQualitiesSingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
-        sub_fdl <- data()[[num]]
-        plotBaseQuals(sub_fdl, usePlotly = TRUE) %>%
-          layout(margin = list(r = 200, b = 50))
-      }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
+            sub_fdl <- data()[[num]]
+            plotBaseQuals(sub_fdl, usePlotly = TRUE,
+                          plotValue = input$BQplotValue) %>%
+                layout(margin = list(r = 200, b = 50))
+        }
     })
     
     ####################
@@ -1249,32 +1337,41 @@ fastqcShiny <- function(fastqcInput = NULL) {
       if (!length(data())) {
         stop("Please load data to display plot.")
       }
-      else{
+      else{withProgress(
+          min = 0,
+          max = 1,
+          value = 0.8,
+          message = "Rendering plot.",
+          {
         plotSeqQuals(
           data(),
           cluster = input$SQcluster,
           counts = input$SQType == "Counts",
           dendrogram = input$SQcluster,
           usePlotly = TRUE
-        ) %>% layout(margin = list(r = 200))
+        ) %>% layout(margin = list(r = 200))}
+      )
       }
     })
     
     output$SeqQualitiesSingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
         sub_fdl <- data()[[num]]
         qualPlot <-
-          plotSeqQuals(sub_fdl, usePlotly = TRUE) %>%
+          plotSeqQuals(sub_fdl, usePlotly = TRUE,
+                       counts = input$SQType == "Counts") %>%
           layout(margin = list(r = 200),
                  legend = list(orientation = 'h', title = ""))
       }
@@ -1288,30 +1385,38 @@ fastqcShiny <- function(fastqcInput = NULL) {
       if (!length(data())) {
         stop("Please load data to display plot.")
       }
-      else{
+      else{withProgress(
+          min = 0,
+          max = 1,
+          value = 0.8,
+          message = "Rendering plot.",
+          {
         plotSeqContent(
           data(),
           cluster = input$SCcluster,
           dendrogram = input$SCcluster,
           usePlotly = TRUE
         ) %>%
-          layout(margin = list(r = 200))
+          layout(margin = list(r = 200))}
+      )
       }
     })
     
     
     output$SCsingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
         sub_fdl <- data()[[num]]
         plotSeqContent(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200))
@@ -1360,7 +1465,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
           GCspecies <- input$GCspecies
         
         GCtype <- input$GCheatType == "Count"
-        
+        withProgress(
+            min = 0,
+            max = 1,
+            value = 0.8,
+            message = "Rendering plot.",
+            {
         if (is.null(input$theoreticalGC)) {
           plotGcContent(
             data(),
@@ -1383,11 +1493,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
             usePlotly = TRUE
           ) %>%
             layout(margin = list(r = 200))
-        }
+        }}
+        )
         
       }
     })
     
+    
+   
     output$GCSingle <- renderPlotly({
       if (!length(data())) {
         stop("Please load data to display plot.")
@@ -1398,12 +1511,14 @@ fastqcShiny <- function(fastqcInput = NULL) {
         } else
           GCspecies <- input$GCspecies
         
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+        else names <- fqName(data())
+        
+        if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+        else {
+            click <- event_data("plotly_click")
+            if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+            else num <- which(names == click$key[[1]])
         }
         sub_fdl <- data()[[num]]
         if (is.null(input$theoreticalGC)) {
@@ -1435,30 +1550,41 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
+          withProgress(
+              min = 0,
+              max = 1,
+              value = 0.8,
+              message = "Rendering plot.",
+              {
         plotNContent(
           data(),
           cluster = input$Ncluster,
           dendrogram = input$Ncluster,
           usePlotly = TRUE
-        )
+        )}
+          )
       }
     })
+    
+    
     
     
     # N Content single plot
     
     output$NCsingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
         sub_fdl <- data()[[num]]
         plotNContent(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200, b = 50))
@@ -1474,7 +1600,12 @@ fastqcShiny <- function(fastqcInput = NULL) {
       if (!length(data())) {
         stop("Please load data to display plot.")
       }
-      else{
+      else{withProgress(
+          min = 0,
+          max = 1,
+          value = 0.8,
+          message = "Rendering plot.",
+          {
         plotSeqLengthDistn(
           data(),
           cluster = input$SLcluster,
@@ -1482,27 +1613,31 @@ fastqcShiny <- function(fastqcInput = NULL) {
           counts = input$SLType == "Counts",
           usePlotly = TRUE
         ) %>%
-          layout(margin = list(r = 200))
+          layout(margin = list(r = 200))}
+      )
       }
     })
     
     
     output$SLSingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
         sub_fdl <- data()[[num]]
         plotSeqLengthDistn(sub_fdl,
                            usePlotly = TRUE,
-                           plotType = "line") %>%
+                           plotType = "line",
+                           counts = input$SLType == "Counts") %>%
           layout(margin = list(r = 200))
       }
     })
@@ -1516,28 +1651,37 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
+          withProgress(
+              min = 0,
+              max = 1,
+              value = 0.8,
+              message = "Rendering plot.",
+              {
         plotDupLevels(
           data(),
           cluster = input$Dupcluster,
           dendrogram = input$Dupcluster,
           usePlotly = TRUE
         ) %>%
-          layout(margin = list(r = 200))
+          layout(margin = list(r = 200))}
+          )
       }
     })
     
     output$DupSingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
         sub_fdl <- data()[[num]]
         plotDupLevels(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200))
@@ -1553,30 +1697,39 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
+          withProgress(
+              min = 0,
+              max = 1,
+              value = 0.8,
+              message = "Rendering plot.",
+              {
         plotOverrep(
           data(),
           usePlotly = TRUE,
           cluster = input$OScluster,
           dendrogram = input$OScluster
         ) %>%
-          layout(margin = list(r = 200))
+          layout(margin = list(r = 200))}
+          )
       }
       
     })
     
     
     output$OSsingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
         sub_fdl <- data()[[num]]
         plotOverrep(sub_fdl, usePlotly = TRUE) %>%
           layout(margin = list(r = 200))
@@ -1592,14 +1745,20 @@ fastqcShiny <- function(fastqcInput = NULL) {
       if (!length(data())) {
         stop("Please load data to display plot.")
       }
-      else{
+      else{withProgress(
+          min = 0,
+          max = 1,
+          value = 0.8,
+          message = "Rendering plot.",
+          {
         ACplot <- plotAdapterContent(
           data(),
           adapterType = input$ACtype,
           usePlotly = TRUE,
           dendrogram = input$ACcluster,
           cluster = input$ACcluster
-        )
+        )}
+      )
         if (!is.null(ACplot))
           ACplot %>% layout(margin = list(r = 200))
         else
@@ -1614,17 +1773,19 @@ fastqcShiny <- function(fastqcInput = NULL) {
     })
     
     output$ACsingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
         sub_fdl <- data()[[num]]
         ACsing <- plotAdapterContent(sub_fdl, usePlotly = TRUE)
         
@@ -1653,12 +1814,20 @@ fastqcShiny <- function(fastqcInput = NULL) {
         stop("Please load data to display plot.")
       }
       else{
+          Kplot <- NULL
+          withProgress(
+              min = 0,
+              max = 1,
+              value = 0.8,
+              message = "Rendering plot.",
+              {
         Kplot <- plotKmers(
           data(),
           usePlotly = TRUE,
           cluster = input$KMcluster,
           dendrogram = input$KMcluster
-        )
+        )}
+          )
         if (!is.null(Kplot))
           Kplot %>% layout(margin = list(r = 200))
         else
@@ -1667,17 +1836,19 @@ fastqcShiny <- function(fastqcInput = NULL) {
     })
     
     output$Ksingle <- renderPlotly({
-      if (!length(data())) {
-        stop("Please load data to display plot.")
-      }
-      else{
-        if (is.null(event_data("plotly_click")$key[[1]])) {
-          num <- 1
-        } else {
-          click <- event_data("plotly_click")
-          if(class(data()) == "character") num <- which(fqName(FastqcDataList(data())) == click$key[[1]])
-          else num <- which(fqName(data()) == click$key[[1]])
+        if (!length(data())) {
+            stop("Please load data to display plot.")
         }
+        else{
+            if(class(data()) == "character") names <- fqName(FastqcDataList(data()))
+            else names <- fqName(data())
+            
+            if (is.null(event_data("plotly_click")$key[[1]])) num <- 1
+            else {
+                click <- event_data("plotly_click")
+                if(!event_data("plotly_click")$key[[1]] %in% names) num <- 1
+                else num <- which(names == click$key[[1]])
+            }
         sub_fdl <- data()[[num]]
         Ksing <- plotKmers(sub_fdl, usePlotly = TRUE)
         
