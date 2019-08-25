@@ -12,10 +12,22 @@ pkgs <- c("BiocGenerics", "BiocStyle", "BSgenome", "checkmate", "devtools", "ggd
 "mikelove/fastqcTheoreticalGC", "UofABioinformaticsHub/ngsReports")
 BiocManager::install(pkgs)
 BiocManager::install('UofABioinformaticsHub/fastqcRShiny')
+```
+# Vignette
+A detailed guide can be found in the vignette.
 
+# Quick start quide
+After loading both the base package `ngsReports` and the shiny app `ngsReportsShiny` the shiny app can simply be run using the 
+function `fastqcShiny().`
+
+```
 library(ngsReports)
 library(fastqcRShiny)
+
+fastqcShiny()
 ```
+Data can then be imported by clicking the "Choose Files" button and navigating to your fastqc files.
+Plots will then be loaded automatically.
 
 # Citation 
 
