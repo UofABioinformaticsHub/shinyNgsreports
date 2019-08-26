@@ -44,6 +44,7 @@
 #' @importFrom shiny renderText
 #' @importFrom shiny reactive
 #' @importFrom shiny withProgress
+#' @importFrom shinyDirectoryInput choose.dir
 #' @importFrom shinyDirectoryInput directoryInput
 #' @importFrom shinyDirectoryInput readDirectoryInput
 #' @importFrom shinyDirectoryInput updateDirectoryInput
@@ -55,15 +56,19 @@
 #'
 #' @examples
 #' \dontrun{
-#' Get the files included with the package ngsReports
+#' ## Get the files included with the package ngsReports
 #' packageDir <- system.file("extdata", package = "ngsReports")
-#' fileList <- list.files(packageDir, pattern = "fastqc.zip", full.names = TRUE)
+#' fl <- list.files(packageDir, pattern = "fastqc.zip", full.names = TRUE)
 #'
 #' # Load the FASTQC data as a FastqcDataList object
-#' fdl <- getFastqcData(fileList)
+#' fdl <- FastqcDataList(fl)
 #'
 #' # Run the Shiny app
 #' fastqcShiny(fdl)
+#' 
+#' ## Or can simply be run using and input files into the shiny app
+#' fastqcShiny()
+#' 
 #' }
 #'
 #' @export
@@ -79,53 +84,6 @@ fastqcShiny <- function(fastqcInput = NULL) {
       any(is(fastqcInput, "character"), is(fastqcInput, "FastqcDataList"))
     )
   }
-  
-  ## set out menu logic for downstream
-  menuItemLogic <- function(flags) {
-    ## initiate the menue logic for PASS, WARN, FAIL flags
-    ## menuLogic will be a list of length 5 containing information on flags
-    menuLogic <- list()
-    if (all(flags$Status == "PASS")) {
-      menuLogic[[1]] <- "PASS"
-      menuLogic[[2]] <- "green"
-    }
-    else {
-      menuLogic[[1]] <- "WARN"
-      menuLogic[[2]] <- "yellow"
-    }
-    
-    if (all(flags$Status == "FAIL")) {
-      menuLogic[[1]] <- "FAIL"
-      menuLogic[[2]] <- "red"
-    }
-    
-    # Fail values
-    menuLogic[[3]] <- c(sum(flags$Status == "FAIL"), length(flags$Status))
-    
-    menuLogic[[4]] <- c(sum(flags$Status == "WARN"), length(flags$Status))
-    
-    # Pass values
-    menuLogic[[5]] <-c(sum(flags$Status == "PASS"), length(flags$Status))
-    
-    menuLogic
-  }
-  
-  
-  
-  ###### renders the box for presence or access of an icon
-  renderValBox <- function(count, status, ic, c) {
-    renderValueBox({
-      valueBox(
-        value = paste(count[1], count[2], sep = "/"),
-        subtitle = status,
-        icon = icon(ic, class = "fa-lg"),
-        color = c
-      )
-    })
-  }
-  
-  
-  
   
   ## start rendering the dashboard gui
   body <- dashboardBody(
@@ -748,7 +706,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         Category <- c()
         flags <- subset(flags, Category == "Per base sequence quality")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$BQflag <- items[[1]]
         values$BQcolour <- items[[2]]
@@ -775,7 +733,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Per sequence quality scores")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$SQflag <- items[[1]]
         values$SQcolour <- items[[2]]
@@ -801,7 +759,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Per base sequence content")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$SCflag <- items[[1]]
         values$SCcolour <- items[[2]]
@@ -827,7 +785,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Per sequence GC content")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$GCflag <- items[[1]]
         values$GCcolour <- items[[2]]
@@ -853,7 +811,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Per base N content")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$NCflag <- items[[1]]
         values$NCcolour <- items[[2]]
@@ -879,7 +837,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Sequence Length Distribution")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$SLDflag <- items[[1]]
         values$SLDcolour <- items[[2]]
@@ -905,7 +863,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Sequence Duplication Levels")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$SDLflag <- items[[1]]
         values$SDLcolour <- items[[2]]
@@ -931,7 +889,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Overrepresented sequences")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$OSflag <- items[[1]]
         values$OScolour <- items[[2]]
@@ -958,7 +916,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Adapter Content")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$ACflag <- items[[1]]
         values$ACcolour <- items[[2]]
@@ -984,7 +942,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
         flags <- getSummary(data())
         flags <- subset(flags, Category == "Kmer Content")
         
-        items <- menuItemLogic(flags = flags)
+        items <- .menuItemLogic(flags = flags)
         
         values$KCflag <- items[[1]]
         values$KCcolour <- items[[2]]
@@ -1008,70 +966,70 @@ fastqcShiny <- function(fastqcInput = NULL) {
     observe({
       input$files
       
-      output$BQboxF <- renderValBox(
+      output$"BQboxF" <- .renderValBox(
         count = values$BQcountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$SQboxF <- renderValBox(
+      output$SQboxF <- .renderValBox(
         count = values$SQcountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$SCboxF <- renderValBox(
+      output$SCboxF <- .renderValBox(
         count = values$SCcountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$GCboxF <- renderValBox(
+      output$GCboxF <- .renderValBox(
         count = values$GCcountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$NCboxF <- renderValBox(
+      output$NCboxF <- .renderValBox(
         count = values$NCcountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$SLDboxF <- renderValBox(
+      output$SLDboxF <- .renderValBox(
         count = values$SLDcountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$SDLboxF <- renderValBox(
+      output$SDLboxF <- .renderValBox(
         count = values$SDLcountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$OSboxF <- renderValBox(
+      output$OSboxF <- .renderValBox(
         count = values$OScountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$ACboxF <- renderValBox(
+      output$ACboxF <- .renderValBox(
         count = values$ACcountF,
         status = "FAIL",
         ic = "times",
         c = "red"
       )
       
-      output$KCboxF <- renderValBox(
+      output$KCboxF <- .renderValBox(
         count = values$KCcountF,
         status = "FAIL",
         ic = "times",
@@ -1080,70 +1038,70 @@ fastqcShiny <- function(fastqcInput = NULL) {
       
       #render warn value boxes
       
-      output$BQboxW <- renderValBox(
+      output$BQboxW <- .renderValBox(
         count = values$BQcountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$SQboxW <- renderValBox(
+      output$SQboxW <- .renderValBox(
         count = values$SQcountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$SCboxW <- renderValBox(
+      output$SCboxW <- .renderValBox(
         count = values$SCcountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$GCboxW <- renderValBox(
+      output$GCboxW <- .renderValBox(
         count = values$GCcountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$NCboxW <- renderValBox(
+      output$NCboxW <- .renderValBox(
         count = values$NCcountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$SLDboxW <- renderValBox(
+      output$SLDboxW <- .renderValBox(
         count = values$SLDcountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$SDLboxW <- renderValBox(
+      output$SDLboxW <- .renderValBox(
         count = values$SDLcountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$OSboxW <- renderValBox(
+      output$OSboxW <- .renderValBox(
         count = values$OScountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$ACboxW <- renderValBox(
+      output$ACboxW <- .renderValBox(
         count = values$ACcountW,
         status = "WARN",
         ic = "exclamation",
         c = "yellow"
       )
       
-      output$KCboxW <- renderValBox(
+      output$KCboxW <- .renderValBox(
         count = values$KCcountW,
         status = "WARN",
         ic = "exclamation",
@@ -1152,70 +1110,70 @@ fastqcShiny <- function(fastqcInput = NULL) {
       
       #render Pass value boxes
       
-      output$BQboxP <- renderValBox(
+      output$BQboxP <- .renderValBox(
         count = values$BQcountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$SQboxP <- renderValBox(
+      output$SQboxP <- .renderValBox(
         count = values$SQcountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$SCboxP <- renderValBox(
+      output$SCboxP <- .renderValBox(
         count = values$SCcountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$GCboxP <- renderValBox(
+      output$GCboxP <- .renderValBox(
         count = values$GCcountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$NCboxP <- renderValBox(
+      output$NCboxP <- .renderValBox(
         count = values$NCcountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$SLDboxP <- renderValBox(
+      output$SLDboxP <- .renderValBox(
         count = values$SLDcountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$SDLboxP <- renderValBox(
+      output$SDLboxP <- .renderValBox(
         count = values$SDLcountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$OSboxP <- renderValBox(
+      output$OSboxP <- .renderValBox(
         count = values$OScountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$ACboxP <- renderValBox(
+      output$ACboxP <- .renderValBox(
         count = values$ACcountP,
         status = "PASS",
         ic = "check",
         c = "green"
       )
       
-      output$KCboxP <- renderValBox(
+      output$KCboxP <- .renderValBox(
         count = values$KCcountP,
         status = "PASS",
         ic = "check",
