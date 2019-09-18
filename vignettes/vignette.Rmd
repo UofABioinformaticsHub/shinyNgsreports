@@ -3,6 +3,7 @@ title: "ngsReports shiny app user guide"
 author:
 - name: Christopher Ward
   affiliation: School of Biological Sciences, University of Adelaide
+  email: christopher.ward@adelaide.edu.au
 - name: Hien To
   affiliation: Bioinformatics Hub, University of Adelaide
 - name: Steve Pederson
@@ -19,6 +20,7 @@ vignette: >
 
 ```{r, echo=FALSE}
 knitr::opts_chunk$set(message = FALSE, warning = FALSE, eval=FALSE)
+fileDir <- system.file("vignettes", package = "fastqcRShiny")
 ```
 
 
@@ -26,11 +28,14 @@ knitr::opts_chunk$set(message = FALSE, warning = FALSE, eval=FALSE)
 
 
 The shiny app can be run after loading the base package `ngsReports` and the 
-shiny app `ngsReportsShinyApp`. 
+shiny app `shinyNgsreports`. 
 
 ```{r, eval=FALSE, include=FALSE}
 library(ngsReports)
 library(ngsReportsShinyApp)
+
+fileDir <- 
+files <- list.files(fileDir, pattern = "fastqc.zip$", full.names = TRUE)
 
 fastqcShiny()
 ```

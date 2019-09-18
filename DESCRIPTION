@@ -1,4 +1,4 @@
-Package: fastqcRShiny
+Package: shinyNgsreports
 Type: Package
 Title: Shiny App for loading multiple FastQC reports 
 Version: 0.99.0
@@ -17,7 +17,8 @@ Depends:
 Imports:
     magrittr,
     plotly,
-    shinyDirectoryInput
+    shinyDirectoryInput,
+    shinyFiles
 LazyData: true
 RoxygenNote: 6.1.1
 biocViews: QualityControl, ReportWriting
