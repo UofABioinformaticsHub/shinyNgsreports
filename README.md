@@ -15,7 +15,7 @@ BiocManager::install(pkgs)
 BiocManager::install('UofABioinformaticsHub/shinyNgsreports')
 ```
 # Vignette
-A detailed guide can be found in the vignette.
+A simple user guide can be found [here](https://cmwbio.github.io/fastqcReports-vignette/index.html).
 
 # Quick start quide
 After loading both the base package `ngsReports` and the shiny app `ngsReportsShiny` the shiny app can simply be run using the 
