@@ -1,4 +1,4 @@
-# fastqcRShiny
+# shinyNgsreports
 
 Graphical User Interface for inspecting FastQC reports using the [ngsReports](https://github.com/UofABioinformaticsHub/ngsReports) R package. 
 
