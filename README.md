@@ -1,6 +1,7 @@
 # shinyNgsreports
 
-Graphical User Interface for inspecting FastQC reports using the [ngsReports](https://github.com/UofABioinformaticsHub/ngsReports) R package. 
+Graphical User Interface for inspecting ngs log files using the [ngsReports](https://github.com/UofABioinformaticsHub/ngsReports) R package. 
+Currently only supports Fastqc reports
 
 ## Installation
 To install required packages and the ngsReports base package follow the instructions below.
@@ -9,9 +10,9 @@ To install required packages and the ngsReports base package follow the instruct
 install.packages("BiocManager")
 pkgs <- c("BiocGenerics", "BiocStyle", "BSgenome", "checkmate", "devtools", "ggdendro",  "plotly",
 "reshape2", "Rsamtools", "scales", "ShortRead", "tidyverse",  "viridis", "viridisLite", "zoo", 
-"mikelove/fastqcTheoreticalGC", "UofABioinformaticsHub/ngsReports")
+"mikelove/fastqcTheoreticalGC", "ngsReports")
 BiocManager::install(pkgs)
-BiocManager::install('UofABioinformaticsHub/fastqcRShiny')
+BiocManager::install('UofABioinformaticsHub/shinyNgsreports')
 ```
 # Vignette
 A detailed guide can be found in the vignette.
@@ -22,7 +23,7 @@ function `fastqcShiny().`
 
 ```
 library(ngsReports)
-library(fastqcRShiny)
+library(shinyNgsreports)
 
 fastqcShiny()
 ```
