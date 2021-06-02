@@ -44,10 +44,6 @@
 #' @importFrom shiny renderText
 #' @importFrom shiny reactive
 #' @importFrom shiny withProgress
-#' @importFrom shinyDirectoryInput choose.dir
-#' @importFrom shinyDirectoryInput directoryInput
-#' @importFrom shinyDirectoryInput readDirectoryInput
-#' @importFrom shinyDirectoryInput updateDirectoryInput
 #' @importFrom shinyFiles shinyFilesButton
 #' @importFrom shinyFiles shinyFileChoose
 #' @importFrom shinyFiles parseFilePaths
@@ -349,14 +345,15 @@ fastqcShiny <- function(fastqcInput = NULL) {
           width = 10
         )
       ),
+      ##################3 commented out to remove shinyDirInput package
       tabItem(
         tabName = "OS",
         column(
           width = 2,
           box(
             checkboxInput("OScluster", "Cluster", value = TRUE),
-            h5("Export Overrepresented Sequences"),
-            directoryInput('ORdirs', label = 'Select a directory', value = '~'),
+            # h5("Export Overrepresented Sequences"),
+            # directoryInput('ORdirs', label = 'Select a directory', value = '~'),
             collapsible = TRUE,
             width = NULL,
             title = "Options"
@@ -429,53 +426,54 @@ fastqcShiny <- function(fastqcInput = NULL) {
           plotlyOutput("Ksingle"),
           width = 10
         )
-      ),
-      tabItem(
-        tabName = "HTML",
-        column(
-          width = 2,
-          box(
-            radioButtons(
-              inputId = "omicsType",
-              label = "-omic Type",
-              choices = c("Genome", "Transcriptome"),
-              selected = "Genome"
-            ),
-            htmlOutput("sequencedSpecies"),
-            h5("Output report for files"),
-            directoryInput('dirs', label = 'Select a directory', value = '~'),
-            collapsible = TRUE,
-            width = NULL,
-            title = "Options"
-          )
-        ),
-        box(
-          h1("Output HTML Report Using the Default Template "),
-          h5(
-            paste(
-            "Select the type of omic data used in your study",
-            "and the most suitable organism"
-            )
-          ),
-          h5(
-            "from the dropdown list. Upon
-            selecting the applicable omic
-            and species, select the directory"
-          ),
-          h5(
-            "containing the FASTQC files
-            you wish to make the log for.
-            Currently even if files have
-            been loaded"
-          ),
-          h5(
-            "into the Shiny app the folder
-            containing the data must still
-            be selected."
-          ),
-          width = 10
-        )
-      )
+      )#,
+      # tabItem(
+      #   tabName = "HTML",
+      #   column(
+      #     width = 2,
+      #     box(
+      #       radioButtons(
+      #         inputId = "omicsType",
+      #         label = "-omic Type",
+      #         choices = c("Genome", "Transcriptome"),
+      #         selected = "Genome"
+      #       ############ commented out to remove ShinyInputDir
+      #       ),
+      #       htmlOutput("sequencedSpecies"),
+      #       h5("Output report for files"),
+      #       directoryInput('dirs', label = 'Select a directory', value = '~'),
+      #       collapsible = TRUE,
+      #       width = NULL,
+      #       title = "Options"
+      #     )
+      #   ),
+      #   box(
+      #     h1("Output HTML Report Using the Default Template "),
+      #     h5(
+      #       paste(
+      #       "Select the type of omic data used in your study",
+      #       "and the most suitable organism"
+      #       )
+      #     ),
+      #     h5(
+      #       "from the dropdown list. Upon
+      #       selecting the applicable omic
+      #       and species, select the directory"
+      #     ),
+      #     h5(
+      #       "containing the FASTQC files
+      #       you wish to make the log for.
+      #       Currently even if files have
+      #       been loaded"
+      #     ),
+      #     h5(
+      #       "into the Shiny app the folder
+      #       containing the data must still
+      #       be selected."
+      #     ),
+      #     width = 10
+      #   )
+      # )
     )
   )
   
@@ -497,8 +495,8 @@ fastqcShiny <- function(fastqcInput = NULL) {
         menuItemOutput("SDLflag"),
         menuItemOutput("OSflag"),
         menuItemOutput("ACflag"),
-        menuItemOutput("KCflag"),
-        menuItem(text = "Output HTML Report", tabName = "HTML")
+        menuItemOutput("KCflag")#,
+        #menuItem(text = "Output HTML Report", tabName = "HTML")
         
         
       ),
@@ -585,36 +583,36 @@ fastqcShiny <- function(fastqcInput = NULL) {
     })
     
     #export overrepresented
-    
-    observeEvent(
-        ignoreNULL = TRUE,
-        eventExpr = {
-            input$ORdirs
-        },
-        handlerExpr = {
-            if (input$ORdirs > 0) {
-                
-                path <- choose.dir(default = readDirectoryInput(session, "ORdirs"))
-                withProgress(
-                    min = 0,
-                    max = 1,
-                    value = 0.8,
-                    message = "Exporting Overrepresented Sequences",
-                    {
-                        exportOverrepresented(
-                            data(),
-                            path = paste0(path, "/OverrepSequences", "-", Sys.Date()),
-                            n = 10,
-                            noAdapters = TRUE
-                        )
-                    }
-                )
-                
-                # update the widget value
-                updateDirectoryInput(session, "ORdirs", value = path)
-            }
-        }
-    )
+    ################################### commented out to remove shinyInputDirectory package
+    # observeEvent(
+    #     ignoreNULL = TRUE,
+    #     eventExpr = {
+    #         input$ORdirs
+    #     },
+    #     handlerExpr = {
+    #         if (input$ORdirs > 0) {
+    #             
+    #             path <- choose.dir(default = readDirectoryInput(session, "ORdirs"))
+    #             withProgress(
+    #                 min = 0,
+    #                 max = 1,
+    #                 value = 0.8,
+    #                 message = "Exporting Overrepresented Sequences",
+    #                 {
+    #                     exportOverrepresented(
+    #                         data(),
+    #                         path = paste0(path, "/OverrepSequences", "-", Sys.Date()),
+    #                         n = 10,
+    #                         noAdapters = TRUE
+    #                     )
+    #                 }
+    #             )
+    #             
+    #             # update the widget value
+    #             updateDirectoryInput(session, "ORdirs", value = path)
+    #         }
+    #     }
+    # )
     
     # expOS <- reactive({
     #   volumes <- shinyFiles::getVolumes()
@@ -634,7 +632,7 @@ fastqcShiny <- function(fastqcInput = NULL) {
     #     )
     #   }
     # })
-    
+    ###################################################
     # # export HTML
     # dir <- reactive({
     #   input$dirs
@@ -666,34 +664,35 @@ fastqcShiny <- function(fastqcInput = NULL) {
     # 
     
     #### new export html
-    observeEvent(
-        ignoreNULL = TRUE,
-        eventExpr = {
-            input$dirs
-        },
-        handlerExpr = {
-            if (input$dirs > 0) {
-                
-                path <- choose.dir(default = readDirectoryInput(session, "dirs"))
-                withProgress(
-                    min = 0,
-                    max = 1,
-                    value = 0.8,
-                    message = "Writing report",
-                    {
-                        writeHtmlReport(path,
-                                        species = values$omicSpecies,
-                                        gcType = input$omicsType, overwrite = TRUE)
-                    }
-                )
-                output$report2 <- renderText("Done!")
-                
-                
-                # update the widget value
-                updateDirectoryInput(session, "dirs", value = path)
-            }
-        }
-    )
+    ##########################3 commented out to remove shinyInputDirectory
+    # observeEvent(
+    #     ignoreNULL = TRUE,
+    #     eventExpr = {
+    #         input$dirs
+    #     },
+    #     handlerExpr = {
+    #         if (input$dirs > 0) {
+    #             
+    #             path <- choose.dir(default = readDirectoryInput(session, "dirs"))
+    #             withProgress(
+    #                 min = 0,
+    #                 max = 1,
+    #                 value = 0.8,
+    #                 message = "Writing report",
+    #                 {
+    #                     writeHtmlReport(path,
+    #                                     species = values$omicSpecies,
+    #                                     gcType = input$omicsType, overwrite = TRUE)
+    #                 }
+    #             )
+    #             output$report2 <- renderText("Done!")
+    #             
+    #             
+    #             # update the widget value
+    #             updateDirectoryInput(session, "dirs", value = path)
+    #         }
+    #     }
+    # )
     
     
     #### dynamic tabs to show pass warn Fail ########
