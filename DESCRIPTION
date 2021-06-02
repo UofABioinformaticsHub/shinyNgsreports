@@ -25,7 +25,6 @@ Imports:
     reshape,
     Rsamtools,
     scales,
-    shinyDirectoryInput,
     shinyFiles,
     ShortRead,
     viridis,
