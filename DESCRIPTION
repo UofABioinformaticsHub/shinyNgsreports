@@ -15,10 +15,22 @@ Depends:
     shiny,
     shinydashboard
 Imports:
+    BiocGenerics,
+    BiocStyle,
+    BSgenome,
+    checkmate,
+    ggdendro,
     magrittr,
     plotly,
+    reshape,
+    Rsamtools,
+    scales,
     shinyDirectoryInput,
-    shinyFiles
+    shinyFiles,
+    ShortRead,
+    viridis,
+    viridisLite,
+    zoo
 LazyData: true
 RoxygenNote: 6.1.1
 biocViews: QualityControl, ReportWriting
