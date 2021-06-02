@@ -8,10 +8,6 @@ To install required packages and the ngsReports base package follow the instruct
 
 ```
 install.packages("BiocManager")
-pkgs <- c("BiocGenerics", "BiocStyle", "BSgenome", "checkmate", "devtools", "ggdendro",  "plotly",
-"reshape2", "Rsamtools", "scales", "ShortRead", "tidyverse",  "viridis", "viridisLite", "zoo", 
-"mikelove/fastqcTheoreticalGC", "ngsReports", "wleepang/shiny-directory-input")
-BiocManager::install(pkgs)
 BiocManager::install('UofABioinformaticsHub/shinyNgsreports')
 ```
 # Vignette
